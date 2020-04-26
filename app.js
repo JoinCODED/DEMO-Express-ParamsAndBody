@@ -7,6 +7,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello World" });
 });
 
+// Cookie List
 app.get("/cookies", (req, res) => {
   res.json(cookies);
 });
