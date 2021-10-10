@@ -1,5 +1,5 @@
 {
-  "name": "ExpressDemo2-CookieDetail",
+  "name": "express-demo2-params-and-body",
   "version": "1.0.0",
   "main": "app.js",
   "license": "MIT",

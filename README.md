@@ -2,18 +2,27 @@
 
 **Topics to discuss:**
 
+- Postman
 - Route Parameters
-- What type of data do we send as a route parameter?
-- What do we NOT send as a route parameter?
-  (Add discussion link here)
+- Request Body
 
 ### Demo:
+
+#### Postman:
+
+1. Open Postman and show them how to send a `get` request to `localhost:8000/cookies`.
+
+2. Show them how to change the method.
+
+3. Show them the response section, the status code and content.
+
+#### Detail Route:
 
 1. Create a route that retrieves the Chocolate Chip Cookies object only.
 
 ```javascript
 app.get("/cookies/1", (req, res) => {
-  const cookie = cookies.find(_cookie => _cookie.id === 1);
+  const cookie = cookies.find((_cookie) => _cookie.id === 1);
   res.json(cookie);
 });
 ```
@@ -22,7 +31,7 @@ app.get("/cookies/1", (req, res) => {
 
 ```javascript
 app.get("/cookies/3", (req, res) => {
-  const cookie = cookies.find(_cookie => _cookie.id === 3);
+  const cookie = cookies.find((_cookie) => _cookie.id === 3);
   res.json(cookie);
 });
 ```
@@ -35,11 +44,11 @@ app.get("/cookies/3", (req, res) => {
 app.get("/cookies/:cookieId", (req, res) => {});
 ```
 
-5. Let's console log the `cookieID` then the `request` to see where is the id saved.
+5. Let's console log the cookie ID then the `request` to see where is the ID saved.
 
 ```javascript
 app.get("/cookies/:cookieId", (req, res) => {
-  console.log("Cookie ID", cookieID);
+  console.log("Cookie ID", cookieId);
   console.log("REQUEST", req);
 });
 ```
@@ -49,7 +58,7 @@ app.get("/cookies/:cookieId", (req, res) => {
 ```javascript
 app.get("/cookies/:cookieId", (req, res) => {
   const { cookieId } = req.params;
-  const cookie = cookies.find(_cookie => _cookie.id === +cookieId);
+  const cookie = cookies.find((_cookie) => _cookie.id === +cookieId);
 });
 ```
 
@@ -58,54 +67,51 @@ app.get("/cookies/:cookieId", (req, res) => {
 ```javascript
 app.get("/cookies/:cookieId", (req, res) => {
   const { cookieId } = req.params;
-  const cookie = cookies.find(_cookie => _cookie.id === +cookieId);
+  const cookie = cookies.find((_cookie) => _cookie.id === +cookieId);
   res.json(cookie);
 });
 ```
 
-8. What if no cookie with this ID existed? Check the network in the browser, you'll see that a `200` response is returned which means everyting went as expected, but that's not true!
+#### Request Body:
 
-9. We need to add a condition to check if the cookie was found or not. If it's found we will return `foundCookie` as our response.
+1. Whenever we're creating, we use the `post` method. Let's try it out!
 
-```javascript
-app.get("/cookies/:cookieId", (req, res) => {
-  const { cookieId } = req.params;
-  const foundCookie = cookies.find(cookie => cookie.id === +cookieId);
-  if (foundCookie) {
-    res.json(foundCookie);
-  }
-});
-```
+   ```javascript
+   app.post("/cookies", (req, res) => {});
+   ```
 
-10. If the cookie isn't found, we need to change the status of the response from `200` to `404`, which means that the requested item was not found. Also we will send back a message in case the frontend wants to display it:
+2. To send data, we pass it through the body of the request. How can we do that in Postman?
 
-```javascript
-if (foundCookie) {
-  res.json(foundCookie);
-} else {
-  res.status(404);
-  res.json({ message: "Cookie not found" });
-}
-```
+   - Step 1: Open Postman, and create new POST request at the top.
+   - Step 2: Copy and paste this url in Postman `http://localhost:8000/cookies`.
+   - Step 3: Under the **URL field**, click on **Body** and choose `raw`.
+   - Step 4: In Body, `raw`, choose `data type: json` and put in your data.
 
-11. We can clean this a bit:
+3. How do we receive the data? Let's `console.log` the request `req`:
 
-```javascript
-res.status(404).json({ message: "Cookie not found" });
-```
+   ```javascript
+   app.post("/cookies", (req, res) => {
+     console.log(req);
+   });
+   ```
 
----
+   We can't find the data! What do we do? For Express to handle the body of a request, we will use a **middleware**.
 
-Your route should look like this by this point:
+4. In `app.js` we will call `app.use` which is a middleware, and inside it we will call `express.json()` method which will parse the body as JSON data and **before** your routes so that it will be applied to all routes.
 
-```javascript
-app.get("/cookies/:cookieId", (req, res) => {
-  const { cookieId } = req.params;
-  const foundCookie = cookies.find(cookie => cookie.id === +cookieId);
-  if (foundCookie) {
-    res.json(foundCookie);
-  } else {
-    res.status(404).json({ message: "Cookie not found" });
-  }
-});
-```
+   ```javascript
+   const app = express();
+
+   app.use(express.json());
+
+   [...]
+   ```
+
+   _Note: Make sure to call `app.use` **before** your routes so that it will be applied to all routes._
+
+5. Let's send a request to the route again. As you can see the data is saved inside `req.body`.
+   ```javascript
+   app.post("/cookies", (req, res) => {
+     console.log(req.body);
+   });
+   ```
